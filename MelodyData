@@ -42,6 +42,7 @@ scale_mapping_minor_scales = {
         "B": ["B", "C#", "D", "E", "F#", "G", "A"]
     }
 
+
 # Define melody data
 class MelodyData:
     def __init__(self, notes):
@@ -100,6 +101,8 @@ def fitness(melody):
         if note in available_notes:
             fitness_score += 1
     return fitness_score
+# if note in scale_mapping_major_scales or scale_mapping_minor_scales:
+    #can be Note.half or Note.quarter or Note.eighth or Node.full 
 
 def create_score(melody):
     """
