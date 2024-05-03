@@ -1,0 +1,85 @@
+import random
+import music21
+
+
+def user_options(desired_scale, desired_key,desired_tempo,desired_duration,available_notes):
+    
+#change to make it user input
+# Define user preferences
+desired_scale = "C Major"
+desired_key = "C"
+desired_tempo = 120
+desired_duration = 8  # Number of bars/beats
+
+# Define available notes
+available_notes = ["C", "D", "E", "F", "G", "A", "B"]
+
+# Define melody data
+class MelodyData:
+    def __init__(self, notes):
+        self.notes = notes
+
+#def user_options(desired_scale, desired_key,desired_tempo,desired_duration,available_notes):
+    
+
+# Generate random melody
+def generate_random_melody(length):
+    return [random.choice(available_notes) for _ in range(length)]
+
+# Genetic algorithm for melody generation
+def generate_melody_with_ga(population_size, generations, fitness_threshold):
+    population = [generate_random_melody(desired_duration) for _ in range(population_size)]
+    for _ in range(generations):
+        population = evolve_population(population, fitness_threshold)
+    return population
+
+# Evolve population using genetic operations
+def evolve_population(population, fitness_threshold):
+    new_population = []
+    for _ in range(len(population)):
+        parent1, parent2 = select_parents(population)
+        child = crossover(parent1, parent2)
+        child = mutate(child)
+        if fitness(child) >= fitness_threshold:
+            return [child]
+        new_population.append(child)
+    return new_population
+
+# Select parents for crossover
+def select_parents(population):
+    return random.choices(population, k=2)
+
+# Perform crossover to create child melody
+def crossover(parent1, parent2):
+    crossover_point = random.randint(1, len(parent1) - 1)
+    return parent1[:crossover_point] + parent2[crossover_point:]
+
+# Perform mutation to introduce diversity
+def mutate(melody):
+    if random.random() < 0.1:  # Mutation rate
+        mutate_index = random.randint(0, len(melody) - 1)
+        melody[mutate_index] = random.choice(available_notes)
+    return melody
+
+# Evaluate fitness of melody based on user preferences
+def fitness(melody):
+    # For simplicity, let's assume higher fitness for melodies closer to desired scale and key
+    fitness_score = 0
+    for note in melody:
+        if note in available_notes:
+            fitness_score += 1
+    return fitness_score
+
+# Main function
+def main():
+    # Generate melodies using genetic algorithm
+    melodies = generate_melody_with_ga(population_size=10, generations=1000, fitness_threshold=desired_duration)
+    # Print generated melodies
+    for i, melody in enumerate(melodies):
+        print(f"Melody {i+1}: {' '.join(melody)}")
+
+   #music21_score = create_score()
+
+# Run the main function
+if __name__ == "__main__":
+    main()
