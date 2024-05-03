@@ -6,16 +6,16 @@ def user_options(desired_scale, desired_key,desired_tempo,desired_duration,avail
     
 #change to make it user input
 # Define user preferences
-desired_scale = "C Major"
+#desired_scale = "C Major"
 desired_key = "C"
 desired_tempo = 120
 desired_duration = 8  # Number of bars/beats
 
 # Define available notes
 available_notes = ["C", "D", "E", "F", "G", "A", "B"]
-note_mapping = {
+scale_mapping = {
         "C": ["C", "D", "E", "F", "G", "A", "B"],
-        "D": ["D", "E", "F", "G", "A", "B", "C"],
+        "D": ["D", "E", "F#", "G", "A", "B", "C"],
         "E": ["E", "F", "G", "A", "B", "C", "D"],
         "F": ["F", "G", "A", "B", "C", "D", "E"],
         "G": ["G", "A", "B", "C", "D", "E", "F"],
@@ -78,6 +78,25 @@ def fitness(melody):
         if note in available_notes:
             fitness_score += 1
     return fitness_score
+
+def create_score(melody):
+    """
+    Create a music21 score with a given melody (list of notes).
+    Returns:
+        music21.stream.Score: A music score containing the melody and note
+            sequence.
+    """
+    # Create a Score object
+    score = music21.stream.Score()
+
+    # Create the melody part and add notes to it
+    melody_part = music21.stream.Part()
+    for note_name, duration in melody:
+        # Create the actual Note object with the note string from list
+        melody_note = music21.note.Note(note_name, quarterLength=duration)
+        melody_part.append(melody_note)
+
+    return score
 
 # Main function
 def main():
