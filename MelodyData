@@ -52,10 +52,15 @@ class MelodyData:
     
 
 # Generate random melody genome
-def generate_random_melody(length):
+def generate_random_melody(list of measures):
     genome = []
-    for i in range(length):
-        genome.append(random.choice(available_notes))
+    if i in list of measures:
+        note = random.choice(available notes)
+        if i == 'quarter':
+            for i in range(4):
+                note = random.choice(available notes)
+            genome[i].append(note.Note(note, type='quarter'))
+        if i == '8th'....
     return genome
 
 # Genetic algorithm for melody generation
