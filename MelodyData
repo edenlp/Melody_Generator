@@ -9,7 +9,17 @@ def user_options(desired_scale, desired_key,desired_tempo,desired_duration,avail
 #desired_scale = "C Major"
 desired_key = "C"
 desired_tempo = 120
-desired_duration = 8  # Number of bars/beats
+desired_measures = 8  # 8 or 16
+# note.Note('C4', type='half') == note.Note('C4', type='quarter')
+if desired_measures == 8:
+    list of 8 measures: [ [],[],[],[],[],[],[],[] ]
+    for i in list of 8 measures:
+        # for each measure:
+        randomly choose quarter, 8th, half, full
+        --> list of 8 measures: [ ['quarter'],['8th'],[...],[...],[...],[...],[],[] ]
+if desired_measures == 16:
+    pass
+
 
 # Define available notes
 available_notes = ["C", "D", "E", "F", "G", "A", "B"]
