@@ -40,9 +40,12 @@ class MelodyData:
 #def user_options(desired_scale, desired_key,desired_tempo,desired_duration,available_notes):
     
 
-# Generate random melody
+# Generate random melody genome
 def generate_random_melody(length):
-    return [random.choice(available_notes) for _ in range(length)]
+    genome = []
+    for i in range(length):
+        genome.append(random.choice(available_notes))
+    return genome
 
 # Genetic algorithm for melody generation
 def generate_melody_with_ga(population_size, generations, fitness_threshold):
