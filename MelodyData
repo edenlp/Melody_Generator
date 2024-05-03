@@ -8,7 +8,7 @@ def user_options(desired_scale, desired_key,desired_tempo,desired_duration,avail
 # Define user preferences
 desired_scale = "C Major"
 desired_key = "C"
-desired_tempo = 120
+desired_tempo = 1200000
 desired_duration = 8  # Number of bars/beats
 
 # Define available notes
