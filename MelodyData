@@ -22,6 +22,15 @@ scale_mapping_major_scales = {
         "A": ["A", "B", "C#", "D", "E", "F#", "G#"],
         "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"]
     }
+scale_mapping_minor_scales = {
+        "C": ["C", "D", "E-", "F", "G", "A-", "B-"],
+        "D": ["D", "E", "F", "G", "A", "B-", "C"],
+        "E": ["E", "F#", "G", "A", "B", "C", "D"],
+        "F": ["F", "G", "A-", "B-", "C", "D-", "E-"],
+        "G": ["G", "A", "B-", "C", "D", "E-", "F"],
+        "A": ["A", "B", "C", "D", "E", "F", "G"],
+        "B": ["B", "C#", "D", "E", "F#", "G", "A"]
+    }
 
 # Define melody data
 class MelodyData:
