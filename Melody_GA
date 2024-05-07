@@ -2,7 +2,6 @@ import random
 import music21
 
 def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict):
-    #Where does desired temp fit into this function? : desired_tempo:int
     measure_list_str = []
     measure_list_objects = []
     counts = [1, 2, 4, 8]
@@ -52,8 +51,6 @@ def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict
 class MelodyData:
     def __init__(self, notes):
         self.notes = notes
-
-#def user_options(desired_scale, desired_key,desired_tempo,desired_duration,available_notes):
 
 # Genetic algorithm for melody generation
 def generate_melody_with_ga(population_size:int, generations:int, fitness_threshold, desired_key:str, desired_measures:int, scale_map:dict):
@@ -159,7 +156,6 @@ if __name__ == "__main__":
     if user_scale == "MINOR":
         user_scale_map = scale_mapping_minor_scales
     user_key = (str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') "))).upper
-    desired_tempo = 120
     user_measures = (str(input("Enter desired measures: (8 or 16) "))).upper
 
     note_list_str, note_list_objects = generate_random_melody(user_key, user_measures, user_scale_map)
