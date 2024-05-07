@@ -1,4 +1,5 @@
 Should we give certain melodies higher scores based on whether the melody uses notes that make up a chord?
 We can also give a higher score to melodies that have repetition?
+--> Evaluate variety within the melody: Are there too many half notes? etc.
 
 For crossover: We do not have to handle the case that an 8 measure melody will be crossed over with a 16 measured melody.
