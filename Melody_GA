@@ -1,27 +1,6 @@
 import random
 import music21
 
-# Define available notes
-available_notes = ["C", "D", "E", "F", "G", "A", "B"]
-scale_mapping_major_scales = {
-        "C": ["C", "D", "E", "F", "G", "A", "B"],
-        "D": ["D", "E", "F#", "G", "A", "B", "C#"],
-        "E": ["E", "F#", "G#", "A", "B", "C#", "D#"],
-        "F": ["F", "G", "A", "B-", "C", "D", "E"],
-        "G": ["G", "A", "B", "C", "D", "E", "F#"],
-        "A": ["A", "B", "C#", "D", "E", "F#", "G#"],
-        "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"]
-    }
-scale_mapping_minor_scales = {
-        "C": ["C", "D", "E-", "F", "G", "A-", "B-"],
-        "D": ["D", "E", "F", "G", "A", "B-", "C"],
-        "E": ["E", "F#", "G", "A", "B", "C", "D"],
-        "F": ["F", "G", "A-", "B-", "C", "D-", "E-"],
-        "G": ["G", "A", "B-", "C", "D", "E-", "F"],
-        "A": ["A", "B", "C", "D", "E", "F", "G"],
-        "B": ["B", "C#", "D", "E", "F#", "G", "A"]
-    }
-
 def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict):
     #Where does desired temp fit into this function? : desired_tempo:int
     measure_list_str = []
@@ -77,16 +56,16 @@ class MelodyData:
 #def user_options(desired_scale, desired_key,desired_tempo,desired_duration,available_notes):
 
 # Genetic algorithm for melody generation
-def generate_melody_with_ga(population_size, generations, fitness_threshold):
-    population = [generate_random_melody(desired_duration) for _ in range(population_size)]
-    for _ in range(generations):
+def generate_melody_with_ga(population_size:int, generations:int, fitness_threshold, desired_key:str, desired_measures:int, scale_map:dict):
+    population = [generate_random_melody(desired_key, desired_measures, scale_map) for i in range(population_size)]
+    for i in range(generations):
         population = evolve_population(population, fitness_threshold)
     return population
 
 # Evolve population using genetic operations
 def evolve_population(population, fitness_threshold):
     new_population = []
-    for _ in range(len(population)):
+    for i in range(len(population)):
         parent1, parent2 = select_parents(population)
         child = crossover(parent1, parent2)
         child = mutate(child)
@@ -152,6 +131,27 @@ def main():
 
 # Run the main function
 if __name__ == "__main__":
+    # Define available notes
+    available_notes = ["C", "D", "E", "F", "G", "A", "B"]
+    scale_mapping_major_scales = {
+            "C": ["C", "D", "E", "F", "G", "A", "B"],
+            "D": ["D", "E", "F#", "G", "A", "B", "C#"],
+            "E": ["E", "F#", "G#", "A", "B", "C#", "D#"],
+            "F": ["F", "G", "A", "B-", "C", "D", "E"],
+            "G": ["G", "A", "B", "C", "D", "E", "F#"],
+            "A": ["A", "B", "C#", "D", "E", "F#", "G#"],
+            "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"]
+        }
+    scale_mapping_minor_scales = {
+            "C": ["C", "D", "E-", "F", "G", "A-", "B-"],
+            "D": ["D", "E", "F", "G", "A", "B-", "C"],
+            "E": ["E", "F#", "G", "A", "B", "C", "D"],
+            "F": ["F", "G", "A-", "B-", "C", "D-", "E-"],
+            "G": ["G", "A", "B-", "C", "D", "E-", "F"],
+            "A": ["A", "B", "C", "D", "E", "F", "G"],
+            "B": ["B", "C#", "D", "E", "F#", "G", "A"]
+        }
+
     user_scale = (str(input("Enter desired scale: (Major or Minor) "))).upper
     #desired_scale = "C Major"
     if user_scale == "MAJOR":
