@@ -150,7 +150,6 @@ if __name__ == "__main__":
         }
 
     user_scale = (str(input("Enter desired scale: (Major or Minor) "))).upper
-    #desired_scale = "C Major"
     if user_scale == "MAJOR":
         user_scale_map = scale_mapping_major_scales
     if user_scale == "MINOR":
@@ -162,7 +161,6 @@ if __name__ == "__main__":
     print(note_list_str)
     print(note_list_objects)
     
-    #print(options_to_notes("C", 8, scale_mapping_minor_scales))
     meep = create_score(note_list_objects)
     meep.show()
     
