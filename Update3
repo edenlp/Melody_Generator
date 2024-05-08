@@ -1,0 +1,234 @@
+import random
+import music21
+
+def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict):
+    measure_list_str = []
+    measure_list_objects = []
+    note_type = [4, 2, 1, 0.5]
+    if desired_measures == 8:
+        measure_list_str = [ [],[],[],[],[],[],[],[] ]
+        # for each measure:
+        for i in range(8):
+            note_type_count = 0
+            while_check = True
+            while while_check is True:
+                measure_count = random.choice(note_type)
+                if measure_count == 4:
+                    measure_count_str = 'whole'
+                if measure_count == 2:
+                    measure_count_str = 'half'
+                if measure_count == 1:
+                    measure_count_str = 'quarter'
+                if measure_count == 0.5:
+                    measure_count_str = 'eighth'
+                if note_type_count + measure_count > 4:
+                    continue
+                if note_type_count + measure_count < 4:
+                    note_choice = random.choice(scale_map[desired_key])
+                    x = [note_choice, measure_count]
+                    measure_list_str[i].append(x)
+                    note_object = music21.note.Note(note_choice, type = measure_count_str)
+                    measure_list_objects.append(note_object)
+                    note_type_count += measure_count
+                if note_type_count + measure_count == 4:
+                    note_choice = random.choice(scale_map[desired_key])
+                    x = [note_choice, measure_count]
+                    measure_list_str[i].append(x)
+                    note_object = music21.note.Note(note_choice, type = measure_count_str)
+                    measure_list_objects.append(note_object)
+                    note_type_count += measure_count
+                    break
+    if desired_measures == 16:
+        measure_list_str = [ [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[] ]
+        # for each measure:
+        for i in range(16):
+            note_type_count = 0
+            while_check = True
+            while while_check is True:
+                measure_count = random.choice(note_type)
+                if measure_count == 4:
+                    measure_count_str = 'whole'
+                if measure_count == 2:
+                    measure_count_str = 'half'
+                if measure_count == 1:
+                    measure_count_str = 'quarter'
+                if measure_count == 0.5:
+                    measure_count_str = 'eighth'
+                if note_type_count + measure_count > 4:
+                    continue
+                if note_type_count + measure_count < 4:
+                    note_choice = random.choice(scale_map[desired_key])
+                    x = [note_choice, measure_count]
+                    measure_list_str[i].append(x)
+                    note_object = music21.note.Note(note_choice, type = measure_count_str)
+                    measure_list_objects.append(note_object)
+                    note_type_count += measure_count
+                if note_type_count + measure_count == 4:
+                    note_choice = random.choice(scale_map[desired_key])
+                    x = [note_choice, measure_count]
+                    measure_list_str[i].append(x)
+                    note_object = music21.note.Note(note_choice, type = measure_count_str)
+                    measure_list_objects.append(note_object)
+                    note_type_count += measure_count
+                    break
+
+    return measure_list_str, measure_list_objects
+
+# Define melody data
+class MelodyData:
+    def __init__(self, notes):
+        self.notes = notes
+
+# Genetic algorithm for melody generation
+def generate_melody_with_ga(population_size:int, generations:int, fitness_threshold, desired_key:str, desired_measures:int, scale_map:dict):
+    population = [generate_random_melody(desired_key, desired_measures, scale_map) for i in range(population_size)]
+    for i in range(generations):
+        population = evolve_population(population, fitness_threshold)
+    return population
+
+# Evolve population using genetic operations
+def evolve_population(population, fitness_threshold):
+    new_population = []
+    for i in range(len(population)):
+        parent1, parent2 = select_parents(population)
+        child = crossover(parent1, parent2)
+        child = mutate(child)
+        if fitness(child) >= fitness_threshold:
+            return [child]
+        new_population.append(child)
+    return new_population
+
+# Select parents for crossover
+def select_parents(population):
+    return random.choices(population, k=2)
+
+# Perform crossover to create two children melodies
+def crossover(melody1, melody2) -> tuple:
+    if len(melody1) != len(melody2):
+        return "Error: Melodies are not the same length"
+    else:
+        crossover_point = random.randint(1, len(melody1) - 1)
+        # Triple nested list ['note', float]
+        melody_child1 = melody1[:crossover_point] + melody2[crossover_point:]
+        melody_child2 = melody2[:crossover_point] + melody1[crossover_point:]
+        print("Crossover point:", crossover_point)
+        melody_child1_object = []
+        for measure in melody_child1:
+            for note in measure:
+                note_str = note[0]
+                note_type = note[1]
+                if note_type == 4:
+                    note_type_str = 'whole'
+                if note_type == 2:
+                    note_type_str = 'half'
+                if note_type == 1:
+                    note_type_str = 'quarter'
+                if note_type == 0.5:
+                    note_type_str = 'eighth'
+                note_object = music21.note.Note(note_str, type = note_type_str)
+                melody_child1_object.append(note_object)
+        melody_child2_object = []
+        for measure in melody_child2:
+            for note in measure:
+                note_str = note[0]
+                note_type = note[1]
+                if note_type == 4:
+                    note_type_str = 'whole'
+                if note_type == 2:
+                    note_type_str = 'half'
+                if note_type == 1:
+                    note_type_str = 'quarter'
+                if note_type == 0.5:
+                    note_type_str = 'eighth'
+                note_object = music21.note.Note(note_str, type = note_type_str)
+                melody_child2_object.append(note_object)
+
+
+    return melody_child1, melody_child1_object, melody_child2, melody_child2_object
+
+# Perform mutation to introduce diversity
+def mutate(melody):
+    if random.random() < 0.1:  # Mutation rate
+        mutate_index = random.randint(0, len(melody) - 1)
+        melody[mutate_index] = random.choice(available_notes)
+    return melody
+
+# Evaluate fitness of melody based on user preferences
+def fitness(melody):
+    # For simplicity, let's assume higher fitness for melodies closer to desired scale and key
+    fitness_score = 0
+    for note in melody:
+        if note in available_notes:
+            fitness_score += 1
+    return fitness_score 
+
+def create_score(melody):
+    """
+    Create a music21 score with a given melody (list of notes).
+    Returns:
+        music21.stream.Score: A music score containing the melody and note
+            sequence.
+    """
+    # Create a Score object
+    score = music21.stream.Score()
+
+#for i, inner_list in enumerate(nested_list): 
+    #for j, element in enumerate(inner_list): 
+
+    # Create the melody part and add notes to it
+    melody_part = music21.stream.Part()
+    for i in melody:
+        melody_part.append(i)
+
+    score.append(melody_part)
+    return score
+
+# Main function
+def main():
+    # Generate melodies using genetic algorithm
+    melodies = generate_melody_with_ga(population_size=10, generations=1000, fitness_threshold=desired_duration)
+    # Print generated melodies
+    for i, melody in enumerate(melodies):
+        print(f"Melody {i+1}: {' '.join(melody)}")
+
+   #music21_score = create_score()
+
+# Run the main function
+if __name__ == "__main__":
+    # Define available notes
+    available_notes = ["C", "D", "E", "F", "G", "A", "B"]
+    scale_mapping_major_scales = {
+            "C": ["C", "D", "E", "F", "G", "A", "B"],
+            "D": ["D", "E", "F#", "G", "A", "B", "C#"],
+            "E": ["E", "F#", "G#", "A", "B", "C#", "D#"],
+            "F": ["F", "G", "A", "B-", "C", "D", "E"],
+            "G": ["G", "A", "B", "C", "D", "E", "F#"],
+            "A": ["A", "B", "C#", "D", "E", "F#", "G#"],
+            "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"]
+        }
+    scale_mapping_minor_scales = {
+            "C": ["C", "D", "E-", "F", "G", "A-", "B-"],
+            "D": ["D", "E", "F", "G", "A", "B-", "C"],
+            "E": ["E", "F#", "G", "A", "B", "C", "D"],
+            "F": ["F", "G", "A-", "B-", "C", "D-", "E-"],
+            "G": ["G", "A", "B-", "C", "D", "E-", "F"],
+            "A": ["A", "B", "C", "D", "E", "F", "G"],
+            "B": ["B", "C#", "D", "E", "F#", "G", "A"]
+        }
+
+    user_scale = (str(input("Enter desired scale: (Major or Minor) "))).upper
+    if user_scale == "MAJOR":
+        user_scale_map = scale_mapping_major_scales
+    if user_scale == "MINOR":
+        user_scale_map = scale_mapping_minor_scales
+    user_key = (str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') "))).upper
+    user_measures = (str(input("Enter desired measures: (8 or 16) "))).upper
+
+    note_list_str, note_list_objects = generate_random_melody(user_key, user_measures, user_scale_map)
+    print(note_list_str)
+    print(note_list_objects)
+    
+    meep = create_score(note_list_objects)
+    meep.show()
+    
+    main()
