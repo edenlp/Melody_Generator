@@ -147,10 +147,30 @@ def crossover(melody1, melody2) -> tuple:
     return melody_child1, melody_child1_object, melody_child2, melody_child2_object
 
 # Perform mutation to introduce diversity
-def mutate(melody):
-    if random.random() < 0.1:  # Mutation rate
+def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -> list:
+    if random.random() < mutation_rate:  # Mutation rate
         mutate_index = random.randint(0, len(melody) - 1)
-        melody[mutate_index] = random.choice(available_notes)
+        print("Mutation index:", mutate_index)
+        new_measure = []
+        note_type = [4, 2, 1, 0.5]
+        note_type_count = 0
+        while_check = True
+        while while_check is True:
+            note_type_choice = random.choice(note_type)
+            if note_type_count + note_type_choice > 4:
+                continue
+            if note_type_count + note_type_choice < 4:
+                note_choice = random.choice(scale_map[desired_key])
+                x = [note_choice, note_type_choice]
+                new_measure.append(x)
+                note_type_count += note_type_choice
+            if note_type_count + note_type_choice == 4:
+                note_choice = random.choice(scale_map[desired_key])
+                x = [note_choice, note_type_choice]
+                new_measure.append(x)
+                note_type_count += note_type_choice
+                break
+        melody[mutate_index] = new_measure
     return melody
 
 # Evaluate fitness of melody based on user preferences
