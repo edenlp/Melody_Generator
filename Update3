@@ -79,25 +79,41 @@ class MelodyData:
     def __init__(self, notes):
         self.notes = notes
 
-def fitness_criteria(composition):
+
+    def fitness_criteria(melody):
     length_variety_score = 0
     pitch_proximity_score = 0
 
     note_type = [4, 2, 1, 0.5] #representing the counts/lengths of each note
     #get the variation of notes
-    note_counts = {duration: sum(1 for note in composition if note.duration == duration) for duration in note_type} #not sure if this line is right tbh
-    #this long line is a dictionary comprehension to count # of each note 
-    #what should happen is that for each duration of note_type it counts the number of notes in the composition with that duration
-    #result is stored in a dictionary note_counts, where each key is a duration from note_type and 
-    #each value is the count of notes with that duration in the composition.
+    full_counter = 0
+    quarter_counter = 0
+    half_counter = 0
+    eighth_counter = 0
+    note_counts= {}
 
+    for measure in melody:
+        for note in measure:
+            note_type = note[1]
+            if note_type == 4:
+                full_counter += 1
+            elif note_type == 2:
+                half_counter += 1
+            elif note_type == 1:
+                quarter_counter += 1
+            elif note_type == 0.5:
+                eighth_counter +=1
+    
+    note_counts = {
+        "full": full_counter,
+        "half" : half_counter,
+        "quarter": quarter_counter,
+        "eighth": eighth_counter
+    }
 
-    #my thought process is that if there is the same number of different notes
-    #that is how to tell there is a good variety, the less = the number of simalr notes there are the less variety
     max_count = max(note_counts.values()) #max number of one type of note
     min_count = min(note_counts.values()) #min number to see how big the difference is
     same_number_difference = max_count - min_count
-
 
     #calculate the variety
     if same_number_difference == 0:
@@ -107,6 +123,7 @@ def fitness_criteria(composition):
     elif same_number_difference in range(6,12):  #difference of 6 to 11 in the total amount of same note duration (ex 6 more half notes than quarter)
             length_variety_score = 0.3
     
+
     #calculate pitch proximity
     for i in range(len(composition) - 1):
         current_note = composition[i] #create index for the current note so that there is a way to tell higher by 1 or lower by 1
