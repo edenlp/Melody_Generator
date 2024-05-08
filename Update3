@@ -258,7 +258,8 @@ def create_score(melody):
    #music21_score = create_score()'''
 
 # Run the main function
-if __name__ == "__main__":
+#if __name__ == "__main__":
+def main():
     # Define available notes
     available_notes = ["C", "D", "E", "F", "G", "A", "B"]
     scale_mapping_major_scales = {
@@ -280,14 +281,14 @@ if __name__ == "__main__":
             "B": ["B", "C#", "D", "E", "F#", "G", "A"]
         }
 
-    user_scale = (str(input("Enter desired scale: (Major or Minor) "))).upper
+    user_scale = str(input("Enter desired scale: (Major or Minor) ")).upper()
     if user_scale == "MAJOR":
         user_scale_map = scale_mapping_major_scales
     if user_scale == "MINOR":
         user_scale_map = scale_mapping_minor_scales
-    user_key = (str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') "))).upper
-    user_measures = (str(input("Enter desired measures: (8 or 16) "))).upper
-
+    user_key = str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') ")).upper()
+    user_measures = int(input("Enter desired measures: (8 or 16) "))
+    print(user_key, user_measures, user_scale, user_scale_map)
     note_list_str, note_list_objects = generate_random_melody(user_key, user_measures, user_scale_map)
     print(note_list_str)
     print(note_list_objects)
@@ -295,4 +296,4 @@ if __name__ == "__main__":
     meep = create_score(note_list_objects)
     meep.show()
     
-    main()
+main()
