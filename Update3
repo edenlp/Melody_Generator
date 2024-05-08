@@ -204,14 +204,14 @@ def create_score(melody):
     return score
 
 # Main function
-def main():
+'''def main():
     # Generate melodies using genetic algorithm
     melodies = generate_melody_with_ga(population_size=10, generations=1000, fitness_threshold=desired_duration)
     # Print generated melodies
     for i, melody in enumerate(melodies):
         print(f"Melody {i+1}: {' '.join(melody)}")
 
-   #music21_score = create_score()
+   #music21_score = create_score()'''
 
 # Run the main function
 if __name__ == "__main__":
