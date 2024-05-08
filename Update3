@@ -75,12 +75,8 @@ def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict
     return measure_list_str, measure_list_objects
 
 # Define melody data
-class MelodyData:
-    def __init__(self, notes):
-        self.notes = notes
 
-
-    def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
+def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
     length_variety_score = 0
     pitch_proximity_score = 0
 
