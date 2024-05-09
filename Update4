@@ -80,7 +80,8 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
     length_variety_score = 0
     pitch_proximity_score = 0
 
-    note_type = [4, 2, 1, 0.5] #representing the counts/lengths of each note
+    #representing the counts/lengths of each note
+    note_type = [4, 2, 1, 0.5]
     #get the variation of notes
     full_counter = 0
     quarter_counter = 0
@@ -147,7 +148,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 1:
                 good_notes = [scale_map[desired_key][-1],
                               scale_map[desired_key][0],
@@ -159,7 +160,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 2:
                 good_notes = [scale_map[desired_key][0],
                               scale_map[desired_key][1],
@@ -171,7 +172,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 3:
                 good_notes = [scale_map[desired_key][1],
                               scale_map[desired_key][2],
@@ -183,7 +184,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 4:
                 good_notes = [scale_map[desired_key][2],
                               scale_map[desired_key][3],
@@ -195,7 +196,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 5:
                 good_notes = [scale_map[desired_key][3],
                               scale_map[desired_key][4],
@@ -207,7 +208,7 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
+                    pitch_proximity_score -= 1
             if current_note_index == 6:
                 good_notes = [scale_map[desired_key][4],
                               scale_map[desired_key][5],
@@ -219,10 +220,18 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
                     pitch_proximity_score += 1
                 else:
                     ## BOO DEDUCT POINTS
-                    pass
-    ##NEED TO CALCULATE PITCH PROXIMITY SCORE
+                    pitch_proximity_score -= 1
     
     return length_variety_score + pitch_proximity_score
+
+# Evaluate fitness of melody based on user preferences
+def evaluate_fitness(melodies:list, desired_key:str, scale_map:dict):
+    # Higher fitness means more variety in note type and good transitions between notes
+    score_list = []
+    for melody in melodies:
+        melody_fitness = fitness_criteria(melody, desired_key, scale_map)
+        score_list.append(melody_fitness)
+    return score_list
 
 # Select parents for crossover
 # list_of_scores have corresponding indices to their melodies
@@ -307,15 +316,6 @@ def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -
         melody[mutate_index] = new_measure
     return melody
 
-# Evaluate fitness of melody based on user preferences
-def evaluate_fitness(melodies:list, desired_key:str, scale_map:dict):
-    # Higher fitness means more variety in note type and good transitions between notes
-    score_list = []
-    for melody in melodies:
-        melody_fitness = fitness_criteria(melody, desired_key, scale_map)
-        score_list.append(melody_fitness)
-    return score_list
-
 # Genetic algorithm for melody generation
 def ga_run(melodies:list, desired_key:str, scale_map:dict):
     new_melody_pop1 = []
@@ -345,7 +345,7 @@ def create_best_melody(user_pop_size:int, user_num_gens:int, user_key:str, user_
     new_melody_gen = inital_melody_pop
     while gen_count < user_num_gens+1:
         new_melody_gen = ga_run(new_melody_gen, user_key, user_scale_map)
-        print(len(new_melody_gen))
+        ##print(len(new_melody_gen))
         gen_count +=1
     # Obtaining the best melody individual
     final_scores = evaluate_fitness(new_melody_gen, user_key, user_scale_map)
