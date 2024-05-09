@@ -113,11 +113,11 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
 
     #calculate the variety
     if same_number_difference == 0:
-            length_variety_score = 1
+            length_variety_score = 3
     elif same_number_difference in range(3,6): #difference of 3 to 5 in the amount of same notes
-            length_variety_score = 0.7
+            length_variety_score = 2
     elif same_number_difference in range(6,12):  #difference of 6 to 11 in the total amount of same note duration (ex 6 more half notes than quarter)
-            length_variety_score = 0.3
+            length_variety_score = 1
     
 
     #calculate pitch proximity
