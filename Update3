@@ -223,27 +223,6 @@ def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
     ##NEED TO CALCULATE PITCH PROXIMITY SCORE
     
     return length_variety_score + pitch_proximity_score
-            
-
-
-'''# Genetic algorithm for melody generation
-def generate_melody_with_ga(population_size:int, generations:int, fitness_threshold, desired_key:str, desired_measures:int, scale_map:dict):
-    population = [generate_random_melody(desired_key, desired_measures, scale_map) for i in range(population_size)]
-    for i in range(generations):
-        population = evolve_population(population, fitness_threshold)
-    return population
-
-# Evolve population using genetic operations
-def evolve_population(population, fitness_threshold):
-    new_population = []
-    for i in range(len(population)):
-        parent1, parent2 = select_parents(population)
-        child = crossover(parent1, parent2)
-        child = mutate(child)
-        if fitness(child) >= fitness_threshold:
-            return [child]
-        new_population.append(child)
-    return new_population'''
 
 # Select parents for crossover
 # list_of_scores have corresponding indices to their melodies
@@ -339,6 +318,26 @@ def evaluate_fitness(melodies:list, desired_key:str, scale_map:dict):
         melody_fitness = fitness_criteria(melody, desired_key, scale_map)
         score_list.append(melody_fitness)
     return score_list
+
+# Genetic algorithm for melody generation
+def ga_run(melodies:list, desired_key:str, scale_map:dict):
+    new_melody_pop1 = []
+    score_list = evaluate_fitness(melodies, desired_key, scale_map)
+    parent_melodies = []
+    for i in range(len(melodies)*2):
+        parent_melodies.append(select_parents(score_list))
+    for i in range(0, len(parent_melodies), 2):
+            ch1_melody, ch2_melody = crossover(parent_melodies[i], parent_melodies[i+1])
+            new_melody_pop1.append(ch1_melody)
+            new_melody_pop1.append(ch2_melody)
+    new_melody_pop2 = []
+    for melody in new_melody_pop1:
+        mutated_melody = mutate(melody, desired_key, scale_map)
+        new_melody_pop2.append(mutated_melody)
+    if len(new_melody_pop2) != len(melodies):
+        print("Error: New population is not the same size")
+    return new_melody_pop2
+    
 
 def create_score(melody):
     """
