@@ -71,8 +71,8 @@ def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict
                     measure_list_objects.append(note_object)
                     note_type_count += measure_count
                     break
-
-    return measure_list_str, measure_list_objects
+        #Can return measure_list_objects if needed
+    return measure_list_str
 
 # Define melody data
 
@@ -337,7 +337,24 @@ def ga_run(melodies:list, desired_key:str, scale_map:dict):
     if len(new_melody_pop2) != len(melodies):
         print("Error: New population is not the same size")
     return new_melody_pop2
+
+def create_best_melody(user_pop_size:int, user_num_gens:int, user_key:str, user_measures:int, user_scale_map:dict):
+    inital_melody_pop = []
+    for i in range(user_pop_size):
+        note_list_str = generate_random_melody(user_key, user_measures, user_scale_map)
+        inital_melody_pop.append(note_list_str)
+    gen_count = 0
+    new_melody_gen = inital_melody_pop
+    while gen_count < user_num_gens:
+        new_melody_gen = ga_run(new_melody_gen, user_key, user_scale_map)
+        gen_count +=1
+    # Obtaining the best melody individual
+    final_scores = evaluate_fitness(new_melody_gen)
+    best_melody_index = final_scores.index(max(final_scores))
+    # make note object
+    melody = new_melody_gen[best_melody_index]
     
+    return melody
 
 def create_score(melody):
     """
@@ -346,6 +363,26 @@ def create_score(melody):
         music21.stream.Score: A music score containing the melody and note
             sequence.
     """
+    note_object_list = []
+    for i in range(len(melody)):
+            for j in range(len(melody[i])):
+                note_str = melody[i][j][0]
+                note_type_num = melody[i][j][1]
+                print(note_str)
+                print(note_type_num)
+
+                if note_type_num == 4:
+                    note_type_num_str = 'whole'
+                if note_type_num == 2:
+                    note_type_num_str = 'half'
+                if note_type_num == 1:
+                    note_type_num_str = 'quarter'
+                if note_type_num == 0.5:
+                    note_type_num_str = 'eighth'
+
+                note_object = music21.note.Note(note_str, type = note_type_num_str)
+                note_object_list.append(note_object)
+
     # Create a Score object
     score = music21.stream.Score()
 
@@ -360,21 +397,11 @@ def create_score(melody):
     score.append(melody_part)
     return score
 
-# Main function
-'''def main():
-    # Generate melodies using genetic algorithm
-    melodies = generate_melody_with_ga(population_size=10, generations=1000, fitness_threshold=desired_duration)
-    # Print generated melodies
-    for i, melody in enumerate(melodies):
-        print(f"Melody {i+1}: {' '.join(melody)}")
-
-   #music21_score = create_score()'''
-
 # Run the main function
 #if __name__ == "__main__":
 def main():
     # Define available notes
-    available_notes = ["C", "D", "E", "F", "G", "A", "B"]
+    #available_notes = ["C", "D", "E", "F", "G", "A", "B"]
     scale_mapping_major_scales = {
             "C": ["C", "D", "E", "F", "G", "A", "B"],
             "D": ["D", "E", "F#", "G", "A", "B", "C#"],
@@ -401,12 +428,13 @@ def main():
         user_scale_map = scale_mapping_minor_scales
     user_key = str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') ")).upper()
     user_measures = int(input("Enter desired measures: (8 or 16) "))
-    print(user_key, user_measures, user_scale, user_scale_map)
-    note_list_str, note_list_objects = generate_random_melody(user_key, user_measures, user_scale_map)
-    print(note_list_str)
-    print(note_list_objects)
+    user_pop_size = int(input("Enter the melody population size: (integer) "))
+    user_num_gens = int(input("Enter the number of generations desired: (integer) "))
+
+    melody = create_best_melody(user_pop_size, user_num_gens,
+                                user_key, user_measures, user_scale_map)
     
-    meep = create_score(note_list_objects)
-    meep.show()
+    best_melody_score_object = create_score(melody)
+    best_melody_score_object.show()
     
 main()
