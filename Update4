@@ -249,22 +249,24 @@ def evaluate_fitness(melodies:list, desired_key:str, scale_map:dict):
     for melody in melodies:
         melody_fitness = fitness_criteria(melody, desired_key, scale_map)
         score_list.append(melody_fitness)
-    return score_list
+    
+    sum_fitness = 0
+    for score in score_list:
+        sum_fitness += score
+
+    normalized_list_of_scores = []
+    for i in score_list:
+        normalized_value = i/sum_fitness
+        normalized_list_of_scores.append(normalized_value)
+    return score_list, sum_fitness
 
 # Select parents for crossover
 # list_of_scores have corresponding indices to their melodies
-def select_parents(list_of_scores:list):
-    sum_fitness = 0
-    for score in list_of_scores:
-        sum_fitness += score
-    normalized_list_if_scores = []
-    for i in list_of_scores:
-        normalized_value = i/sum_fitness
-        normalized_list_if_scores.append(normalized_value)
+def select_parents(list_of_scores:list, sum_fit):
     # return individual that got selected
     partial_sum = 0
     i = 0 # index of individual
-    rand = random.random() * sum_fitness
+    rand = random.random() * sum_fit
     while (partial_sum < rand) and (i != len(list_of_scores) - 1):
         i += 1
         partial_sum += list_of_scores[i]
@@ -341,11 +343,11 @@ def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -
 # Genetic algorithm for melody generation
 def ga_run(melodies:list, desired_key:str, scale_map:dict):
     new_melody_pop1 = []
-    score_list = evaluate_fitness(melodies, desired_key, scale_map)
+    score_list, sum_fitness = evaluate_fitness(melodies, desired_key, scale_map)
     parent_melodies = []
     for i in range(len(melodies)):
         ###
-        parent_melodies.append(melodies[select_parents(score_list)])
+        parent_melodies.append(melodies[select_parents(score_list, sum_fitness)])
     for i in range(0, len(parent_melodies), 2):
             ch1_melody, ch2_melody = crossover(parent_melodies[i], parent_melodies[i+1])
             new_melody_pop1.append(ch1_melody)
@@ -370,8 +372,8 @@ def create_best_melody(user_pop_size:int, user_num_gens:int, user_key:str, user_
         ##print(len(new_melody_gen))
         gen_count +=1
     # Obtaining the best melody individual
-    final_scores = evaluate_fitness(new_melody_gen, user_key, user_scale_map)
-    best_melody_index = final_scores.index(max(final_scores))
+    score_list, sum_fitness = evaluate_fitness(new_melody_gen, user_key, user_scale_map)
+    best_melody_index = score_list.index(max(score_list))
     # make note object
     melody = new_melody_gen[best_melody_index]
     
