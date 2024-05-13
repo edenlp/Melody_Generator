@@ -319,16 +319,16 @@ def crossover(melody1, melody2) -> tuple:
             note_object = music21.note.Note(note_str, type = note_type_str)
             melody_child2_object.append(note_object)
 
-    # Return children melodies 
+    # Has option to return melody_child1_object and melody_child2_object Note objects
     return melody_child1, melody_child2
 
-# Perform mutation to introduce diversity
+# Perform mutation to introduce diversity, pm automatically set to 0.5
 def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -> list:
     #Check if mutation should occur based on mutation rate
     if random.random() < mutation_rate:  # Mutation rate
         mutate_index = random.randint(0, len(melody) - 1) #Select a random index for mutation
-        #print("Mutation index:", mutate_index)
-        new_measure = [] # initializse an empty list to store the mutated measure
+        ##print("Mutation index:", mutate_index)
+        new_measure = [] # initialize an empty list to store the mutated measure
         note_type = [4, 2, 1, 0.5] #Define possible note durations
         note_type_count = 0 #Initialize a variable to store the count of note durations
         while_check = True #Initialize a variable for the while loop condition
@@ -337,7 +337,7 @@ def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -
             note_type_choice = random.choice(note_type) #Randomly select a note duration
             #Check if adding the selected note duration exceeds the measure length
             if note_type_count + note_type_choice > 4:
-                continue
+                continue # Reselect note_type_choice
             #Check if the measure length is not yet reached
             if note_type_count + note_type_choice < 4:
                 note_choice = random.choice(scale_map[desired_key]) #Randomly select a note
@@ -398,21 +398,15 @@ def create_best_melody(user_pop_size:int, user_num_gens:int, user_key:str, user_
     
     return melody  #Return the best melody
 
+# Creates a music21 score with a list of Note objects, returns music21.stream.Score:
+    #    A music score containing the melody and note sequence.
 def create_score(melody):
-    """
-    Create a music21 score with a given melody (list of notes).
-    Returns:
-        music21.stream.Score: A music score containing the melody and note
-            sequence.
-    """
     note_object_list = []
     #Convert melody to music21 note objects
     for i in range(len(melody)):
             for j in range(len(melody[i])):
                 note_str = melody[i][j][0]
                 note_type_num = melody[i][j][1]
-                #print(note_str)
-                #print(note_type_num)
 
                 if note_type_num == 4:
                     note_type_num_str = 'whole'
@@ -425,12 +419,9 @@ def create_score(melody):
 
                 note_object = music21.note.Note(note_str, type = note_type_num_str)
                 note_object_list.append(note_object)
-    #print(note_object)
+    ##print(note_object)
     # Create a Score object
     score = music21.stream.Score()
-
-#for i, inner_list in enumerate(nested_list): 
-    #for j, element in enumerate(inner_list): 
 
     # Create the melody and add notes to it
     melody_part = music21.stream.Part()
