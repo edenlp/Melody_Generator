@@ -1,0 +1,463 @@
+# Eden Pardo and Ella Stone, pledged.
+
+import random
+import music21
+
+# This function serves as a generator for the initial melody population.
+#   Based on the user inputs, it randomly generates a triple nested list, melody[[measures[notes]]]
+def generate_random_melody(desired_key:str, desired_measures:int, scale_map:dict):
+    measure_list_str = []
+    measure_list_objects = [] # This variable is part of the optional melody music21 object return
+    note_type = [4, 2, 1, 0.5] # Represents the note duration [full, half, quarter, eighth]
+    if desired_measures == 8: # If user chooses an 8 measured melody
+        # Genome representation (starts with a double nested list, then becomes
+        #       a triple nested list once notes are added)
+        measure_list_str = [ [],[],[],[],[],[],[],[] ]
+        # For each measure:
+        for i in range(8):
+            # This while loop ensures the time signature 4/4 in each measure
+            note_type_count = 0
+            while_check = True
+            while while_check is True:
+                measure_count = random.choice(note_type) # Choosing a note duration
+                if measure_count == 4:
+                    measure_count_str = 'whole'
+                if measure_count == 2:
+                    measure_count_str = 'half'
+                if measure_count == 1:
+                    measure_count_str = 'quarter'
+                if measure_count == 0.5:
+                    measure_count_str = 'eighth'
+                # This means that the 4/4 time signature has been violated for the measure
+                #   It must choose a new note count
+                if note_type_count + measure_count > 4:
+                    continue
+                # This means that the 4/4 time signature has yet to be fulfilled for the measure
+                if note_type_count + measure_count < 4:
+                    note_choice = random.choice(scale_map[desired_key]) # Choosing a note type
+                    x = [note_choice, measure_count] # Creating the note list
+                    measure_list_str[i].append(x) # Adding the note to the corresponding measure
+                    note_object = music21.note.Note(note_choice, type = measure_count_str) # Optional return
+                    measure_list_objects.append(note_object) # Optional return
+                    note_type_count += measure_count
+                # This means that the 4/4 time signature has been fulfilled for the measure
+                #   It can now move on to generate the next measure (if needed)
+                if note_type_count + measure_count == 4:
+                    note_choice = random.choice(scale_map[desired_key]) # Choosing a note type
+                    x = [note_choice, measure_count] # Creating the note list
+                    measure_list_str[i].append(x) # Adding the note to the corresponding measure
+                    note_object = music21.note.Note(note_choice, type = measure_count_str) # Optional return
+                    measure_list_objects.append(note_object) # Optional return
+                    note_type_count += measure_count
+                    break
+    if desired_measures == 16: # If user chooses a 16 measured melody
+        # Genome representation (starts with a double nested list, then becomes
+        #       a triple nested list once notes are added)
+        measure_list_str = [ [],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[] ]
+        # for each measure:
+        for i in range(16):
+            # This while loop ensures the time signature 4/4 in each measure
+            note_type_count = 0
+            while_check = True
+            while while_check is True:
+                measure_count = random.choice(note_type) # Choosing a note duration
+                if measure_count == 4:
+                    measure_count_str = 'whole'
+                if measure_count == 2:
+                    measure_count_str = 'half'
+                if measure_count == 1:
+                    measure_count_str = 'quarter'
+                if measure_count == 0.5:
+                    measure_count_str = 'eighth'
+                # This means that the 4/4 time signature has been violated for the measure
+                #   It must choose a new note count
+                if note_type_count + measure_count > 4:
+                    continue
+                # This means that the 4/4 time signature has yet to be fulfilled for the measure
+                if note_type_count + measure_count < 4:
+                    note_choice = random.choice(scale_map[desired_key]) # Choosing a note type
+                    x = [note_choice, measure_count] # Creating the note list 
+                    measure_list_str[i].append(x) # Adding the note to the corresponding measure
+                    note_object = music21.note.Note(note_choice, type = measure_count_str) # Optional return
+                    measure_list_objects.append(note_object) # Optional return
+                    note_type_count += measure_count
+                # This means that the 4/4 time signature has been fulfilled for the measure
+                #   It can now move on to generate the next measure (if needed)
+                if note_type_count + measure_count == 4:
+                    note_choice = random.choice(scale_map[desired_key])
+                    x = [note_choice, measure_count] # Creating the note list
+                    measure_list_str[i].append(x) # Adding the note to the corresponding measure
+                    note_object = music21.note.Note(note_choice, type = measure_count_str) # Optional return
+                    measure_list_objects.append(note_object) # Optional return
+                    note_type_count += measure_count
+                    break
+        #Can return measure_list_objects if needed
+    return measure_list_str
+
+# This function serves to score each melody based on note duration variation and pitch proximity
+def fitness_criteria(melody:list, desired_key:str, scale_map:dict):
+    length_variety_score = 0
+    pitch_proximity_score = 0
+
+    note_type = [4, 2, 1, 0.5] # Represents the note duration [full, half, quarter, eighth]
+    
+    # Getting the count of each note duration in the melody
+    full_counter = 0
+    quarter_counter = 0
+    half_counter = 0
+    eighth_counter = 0
+    note_counts= {}
+
+    for measure in melody:
+        for note in measure:
+            note_type = note[1]
+            if note_type == 4:
+                full_counter += 1
+            elif note_type == 2:
+                half_counter += 1
+            elif note_type == 1:
+                quarter_counter += 1
+            elif note_type == 0.5:
+                eighth_counter +=1
+    note_counts = {
+        "full": full_counter,
+        "half": half_counter,
+        "quarter": quarter_counter,
+        "eighth": eighth_counter
+    }
+    max_count = max(note_counts.values()) # Max number of one type of note duration
+    min_count = min(note_counts.values()) # Min number to see how big the difference is
+    same_number_difference = max_count - min_count
+
+    # Calculate the variety
+    if same_number_difference == 0: # Most variety
+            length_variety_score = 3
+    elif same_number_difference in range(3,6): # Difference of 3 to 5 in the amount of same notes
+            length_variety_score = 2
+    elif same_number_difference in range(6,12):  # Difference of 6 to 11 in the total amount of same note duration (ex 6 more half notes than quarter)
+            length_variety_score = 1
+    
+    # Calculate pitch proximity
+    for i in range(len(melody)): # Iterating through the melody to get each note string to compare to the next note
+        for j in range(len(melody[i])):
+            if j+1 < len(melody[i]):
+                current_note = melody[i][j][0]
+                next_note = melody[i][j+1][0]
+                ##print("Current Element:", current_note, "--Next Element:", next_note)
+            else: # The case where there is no next note within the specific measure
+                    #   Must compare the note to the next note in the next measure
+                if i+1 < len(melody):
+                    current_note = melody[i][j][0]
+                    next_note = melody[i+1][0][0]
+                    ##print("Current Element:", current_note, "--Next Element:", next_note)
+                else: # There is no more notes to compare
+                    break
+            # Mapping the current notes being compared, to the notes that are avilable in the specific pitch
+            current_note_index = scale_map[desired_key].index(current_note)
+            next_note_index = scale_map[desired_key].index(next_note)
+            if current_note_index == 0:
+                good_notes = [scale_map[desired_key][-2],
+                              scale_map[desired_key][-1],
+                              scale_map[desired_key][0],
+                              scale_map[desired_key][1],
+                              scale_map[desired_key][2]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 1:
+                good_notes = [scale_map[desired_key][-1],
+                              scale_map[desired_key][0],
+                              scale_map[desired_key][1],
+                              scale_map[desired_key][2],
+                              scale_map[desired_key][3]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 2:
+                good_notes = [scale_map[desired_key][0],
+                              scale_map[desired_key][1],
+                              scale_map[desired_key][2],
+                              scale_map[desired_key][3],
+                              scale_map[desired_key][4]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 3:
+                good_notes = [scale_map[desired_key][1],
+                              scale_map[desired_key][2],
+                              scale_map[desired_key][3],
+                              scale_map[desired_key][4],
+                              scale_map[desired_key][5]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 4:
+                good_notes = [scale_map[desired_key][2],
+                              scale_map[desired_key][3],
+                              scale_map[desired_key][4],
+                              scale_map[desired_key][5],
+                              scale_map[desired_key][6]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 5:
+                good_notes = [scale_map[desired_key][3],
+                              scale_map[desired_key][4],
+                              scale_map[desired_key][5],
+                              scale_map[desired_key][6],
+                              scale_map[desired_key][0]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+            if current_note_index == 6:
+                good_notes = [scale_map[desired_key][4],
+                              scale_map[desired_key][5],
+                              scale_map[desired_key][6],
+                              scale_map[desired_key][0],
+                              scale_map[desired_key][1]]
+                if scale_map[desired_key][next_note_index] in good_notes:
+                    ## YAY ADD POINTS
+                    pitch_proximity_score += 1
+                else:
+                    ## BOO DEDUCT POINTS
+                    pitch_proximity_score -= 1
+    
+    return length_variety_score + pitch_proximity_score
+
+# Evaluate fitness of melody based on user preferences
+def evaluate_fitness(melodies:list, desired_key:str, scale_map:dict):
+    # Higher fitness means more variety in note type and good transitions between notes
+    score_list = []
+    for melody in melodies:
+        melody_fitness = fitness_criteria(melody, desired_key, scale_map)
+        score_list.append(melody_fitness)
+    
+    sum_fitness = 0
+    for score in score_list:
+        sum_fitness += score
+
+    normalized_list_of_scores = []
+    for i in score_list:
+        normalized_value = i/sum_fitness
+        normalized_list_of_scores.append(normalized_value)
+    return score_list, sum_fitness
+
+# Select parents for crossover
+# list_of_scores have corresponding indices to their melodies
+def select_parents(list_of_scores:list, sum_fit):
+    # return individual that got selected
+    partial_sum = 0
+    i = 0 # index of individual
+    rand = random.random() * sum_fit
+    while (partial_sum < rand) and (i != len(list_of_scores) - 1):
+        i += 1
+        partial_sum += list_of_scores[i]
+    return i
+
+# Perform crossover to create two children melodies
+def crossover(melody1, melody2) -> tuple:
+    crossover_point = random.randint(1, len(melody1) - 1)
+    # Triple nested list ['note', float]
+    melody_child1 = melody1[:crossover_point] + melody2[crossover_point:]
+    melody_child2 = melody2[:crossover_point] + melody1[crossover_point:]
+    #print("Crossover point:", crossover_point)
+    melody_child1_object = []
+    for measure in melody_child1:
+        for note in measure:
+            note_str = note[0]
+            note_type = note[1]
+            if note_type == 4:
+                note_type_str = 'whole'
+            if note_type == 2:
+                note_type_str = 'half'
+            if note_type == 1:
+                note_type_str = 'quarter'
+            if note_type == 0.5:
+                note_type_str = 'eighth'
+            note_object = music21.note.Note(note_str, type = note_type_str)
+            melody_child1_object.append(note_object)
+    melody_child2_object = []
+    for measure in melody_child2:
+        for note in measure:
+            note_str = note[0]
+            note_type = note[1]
+            if note_type == 4:
+                note_type_str = 'whole'
+            if note_type == 2:
+                note_type_str = 'half'
+            if note_type == 1:
+                note_type_str = 'quarter'
+            if note_type == 0.5:
+                note_type_str = 'eighth'
+            note_object = music21.note.Note(note_str, type = note_type_str)
+            melody_child2_object.append(note_object)
+
+    # Can return melody_child1_object, melody_child2_object
+    return melody_child1, melody_child2
+
+# Perform mutation to introduce diversity
+def mutate(melody: list, desired_key:str, scale_map:dict, mutation_rate = 0.5) -> list:
+    if random.random() < mutation_rate:  # Mutation rate
+        mutate_index = random.randint(0, len(melody) - 1)
+        #print("Mutation index:", mutate_index)
+        new_measure = []
+        note_type = [4, 2, 1, 0.5]
+        note_type_count = 0
+        while_check = True
+        while while_check is True:
+            note_type_choice = random.choice(note_type)
+            if note_type_count + note_type_choice > 4:
+                continue
+            if note_type_count + note_type_choice < 4:
+                note_choice = random.choice(scale_map[desired_key])
+                x = [note_choice, note_type_choice]
+                new_measure.append(x)
+                note_type_count += note_type_choice
+            if note_type_count + note_type_choice == 4:
+                note_choice = random.choice(scale_map[desired_key])
+                x = [note_choice, note_type_choice]
+                new_measure.append(x)
+                note_type_count += note_type_choice
+                break
+        melody[mutate_index] = new_measure
+    return melody
+
+# Genetic algorithm for melody generation
+def ga_run(melodies:list, desired_key:str, scale_map:dict):
+    new_melody_pop1 = []
+    score_list, sum_fitness = evaluate_fitness(melodies, desired_key, scale_map)
+    parent_melodies = []
+    for i in range(len(melodies)):
+        ###
+        parent_melodies.append(melodies[select_parents(score_list, sum_fitness)])
+    for i in range(0, len(parent_melodies), 2):
+            ch1_melody, ch2_melody = crossover(parent_melodies[i], parent_melodies[i+1])
+            new_melody_pop1.append(ch1_melody)
+            new_melody_pop1.append(ch2_melody)
+    new_melody_pop2 = []
+    for melody in new_melody_pop1:
+        mutated_melody = mutate(melody, desired_key, scale_map)
+        new_melody_pop2.append(mutated_melody)
+    if len(new_melody_pop2) != len(melodies):
+        print("Error: New population is not the same size")
+    return new_melody_pop2
+
+def create_best_melody(user_pop_size:int, user_num_gens:int, user_key:str, user_measures:int, user_scale_map:dict):
+    inital_melody_pop = []
+    for i in range(user_pop_size):
+        note_list_str = generate_random_melody(user_key, user_measures, user_scale_map)
+        inital_melody_pop.append(note_list_str)
+    gen_count = 0
+    new_melody_gen = inital_melody_pop
+    while gen_count < user_num_gens+1:
+        new_melody_gen = ga_run(new_melody_gen, user_key, user_scale_map)
+        ##print(len(new_melody_gen))
+        gen_count +=1
+    # Obtaining the best melody individual
+    score_list, sum_fitness = evaluate_fitness(new_melody_gen, user_key, user_scale_map)
+    best_melody_index = score_list.index(max(score_list))
+    # make note object
+    melody = new_melody_gen[best_melody_index]
+    
+    return melody
+
+def create_score(melody):
+    """
+    Create a music21 score with a given melody (list of notes).
+    Returns:
+        music21.stream.Score: A music score containing the melody and note
+            sequence.
+    """
+    note_object_list = []
+    for i in range(len(melody)):
+            for j in range(len(melody[i])):
+                note_str = melody[i][j][0]
+                note_type_num = melody[i][j][1]
+                #print(note_str)
+                #print(note_type_num)
+
+                if note_type_num == 4:
+                    note_type_num_str = 'whole'
+                if note_type_num == 2:
+                    note_type_num_str = 'half'
+                if note_type_num == 1:
+                    note_type_num_str = 'quarter'
+                if note_type_num == 0.5:
+                    note_type_num_str = 'eighth'
+
+                note_object = music21.note.Note(note_str, type = note_type_num_str)
+                note_object_list.append(note_object)
+    #print(note_object)
+    # Create a Score object
+    score = music21.stream.Score()
+
+#for i, inner_list in enumerate(nested_list): 
+    #for j, element in enumerate(inner_list): 
+
+    # Create the melody part and add notes to it
+    melody_part = music21.stream.Part()
+    for i in note_object_list:
+        melody_part.append(i)
+
+    score.append(melody_part)
+    return score
+
+# Run the main function
+#if __name__ == "__main__":
+def main():
+    # Define available notes
+    #available_notes = ["C", "D", "E", "F", "G", "A", "B"]
+    scale_mapping_major_scales = {
+            "C": ["C", "D", "E", "F", "G", "A", "B"],
+            "D": ["D", "E", "F#", "G", "A", "B", "C#"],
+            "E": ["E", "F#", "G#", "A", "B", "C#", "D#"],
+            "F": ["F", "G", "A", "B-", "C", "D", "E"],
+            "G": ["G", "A", "B", "C", "D", "E", "F#"],
+            "A": ["A", "B", "C#", "D", "E", "F#", "G#"],
+            "B": ["B", "C#", "D#", "E", "F#", "G#", "A#"]
+        }
+    scale_mapping_minor_scales = {
+            "C": ["C", "D", "E-", "F", "G", "A-", "B-"],
+            "D": ["D", "E", "F", "G", "A", "B-", "C"],
+            "E": ["E", "F#", "G", "A", "B", "C", "D"],
+            "F": ["F", "G", "A-", "B-", "C", "D-", "E-"],
+            "G": ["G", "A", "B-", "C", "D", "E-", "F"],
+            "A": ["A", "B", "C", "D", "E", "F", "G"],
+            "B": ["B", "C#", "D", "E", "F#", "G", "A"]
+        }
+
+    user_scale = str(input("Enter desired scale: (Major or Minor) ")).upper()
+    if user_scale == "MAJOR":
+        user_scale_map = scale_mapping_major_scales
+    if user_scale == "MINOR":
+        user_scale_map = scale_mapping_minor_scales
+    user_key = str(input("Enter desired key: ('C', 'D', 'E', 'F', 'G', 'A', or 'B') ")).upper()
+    user_measures = int(input("Enter desired measures: (8 or 16) "))
+    user_pop_size = int(input("Enter the melody population size: (integer) "))
+    user_num_gens = int(input("Enter the number of generations desired: (integer) "))
+
+    melody = create_best_melody(user_pop_size, user_num_gens,
+                                user_key, user_measures, user_scale_map)
+    print(melody)
+    best_melody_score_object = create_score(melody)
+    best_melody_score_object.show()
+    
+main()
